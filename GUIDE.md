@@ -223,6 +223,73 @@ public ResponseEntity<YourDomainModel> create(...) {
 }
 ```
 
+## Qualité du Code
+
+### SpotBugs et Checkstyle
+
+Ce projet intègre deux outils essentiels pour maintenir une haute qualité de code :
+
+#### 1. SpotBugs
+
+Outil d'analyse statique qui détecte automatiquement les bugs potentiels :
+
+```bash
+# Lancer l'analyse graphique
+mvn spotbugs:gui
+
+# Vérification en ligne de commande
+mvn spotbugs:check
+```
+
+SpotBugs vérifie :
+
+- Bugs de concurrence
+- Vulnérabilités de sécurité
+- Mauvaises pratiques
+- Problèmes de performance
+
+#### 2. Checkstyle
+
+Outil de vérification des standards de codage :
+
+```bash
+# Vérifier le style
+mvn checkstyle:check
+
+# Générer un rapport détaillé
+mvn checkstyle:checkstyle
+```
+
+Notre configuration Checkstyle (`checkstyle.xml`) impose :
+
+- Maximum 50 lignes par méthode
+- Maximum 8 paramètres par méthode
+- Documentation Javadoc obligatoire
+- Conventions de nommage strictes
+- Gestion des imports optimisée
+
+### Utilisation Quotidienne
+
+1. **Avant chaque commit** :
+
+```bash
+mvn clean verify
+```
+
+Cette commande exécute tous les contrôles qualité.
+
+2. **Rapports** :
+
+- SpotBugs : `target/spotbugsXml.xml`
+- Checkstyle : `target/site/checkstyle.html`
+
+3. **Configuration** :
+
+- SpotBugs : Configuration dans `pom.xml`
+- Checkstyle : Règles dans `checkstyle.xml`
+
+Pour plus de détails, consultez [CODE_QUALITY.md](docs/CODE_QUALITY.md)
+
 ## Bonnes Pratiques
 
 1. **Validation** : Utilisez les annotations de validation sur vos modèles de domaine
@@ -230,6 +297,7 @@ public ResponseEntity<YourDomainModel> create(...) {
 3. **Logging** : Utilisez SLF4J pour le logging
 4. **Tests** : Visez une couverture de code élevée
 5. **Documentation** : Documentez vos API et votre code
+6. **Qualité** : Utilisez SpotBugs et Checkstyle avant chaque commit
 
 ## Checklist de Développement
 

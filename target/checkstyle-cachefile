@@ -1,0 +1,12 @@
+#Wed Oct 15 06:58:20 CEST 2025
+configuration*?=BAB10F7F73EE3A0F39BCACABB5DDC6E6B14E0BE7
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/config/security/ApiKeyAuthFilter.java=1760474492089
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/adapters/output/persistence/repository/JpaProductRepository.java=1760474488669
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/config/security/SecurityConfig.java=1760474509602
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/domain/ports/api/ProductService.java=1760474484585
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/adapters/output/persistence/mapper/ProductMapper.java=1760474488080
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/domain/model/Product.java=1760474482633
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/domain/ports/spi/ProductRepository.java=1760474485383
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/config/security/ApiKeyProperties.java=1760474491280
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/adapters/output/persistence/ProductPersistenceAdapter.java=1760474489283
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/config/OpenApiConfig.java=1760504289982

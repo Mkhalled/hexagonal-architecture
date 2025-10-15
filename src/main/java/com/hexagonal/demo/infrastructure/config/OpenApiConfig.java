@@ -20,3 +20,6 @@ import org.springframework.context.annotation.Configuration;
     in = io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER,
     paramName = "X-API-KEY"
 )
+public class OpenApiConfig {
+    // Configuration OpenAPI pour la documentation et la sécurité par API Key
+}

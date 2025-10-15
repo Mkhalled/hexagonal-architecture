@@ -1,0 +1,14 @@
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/HexagonalApplication.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/config/security/ApiKeyAuthFilter.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/config/security/SecurityConfig.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/domain/ports/api/ProductService.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/domain/model/Product.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/config/security/ApiKeyProperties.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/adapters/output/persistence/repository/JpaProductRepository.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/adapters/output/persistence/entity/ProductEntity.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/adapters/input/rest/ProductController.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/domain/ports/spi/ProductRepository.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/adapters/output/persistence/mapper/ProductMapper.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/config/OpenApiConfig.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/domain/service/ProductServiceImpl.java
+/Users/khalledmeneouali/Documents/Workspaces/trainings/hexagonal-architecture/src/main/java/com/hexagonal/demo/infrastructure/adapters/output/persistence/ProductPersistenceAdapter.java
