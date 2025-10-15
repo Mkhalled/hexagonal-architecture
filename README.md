@@ -18,6 +18,59 @@ src/main/java/com/hexagonal/demo/
 └── HexagonalApplication.java
 ```
 
+## Gestion des logs
+
+Spring Boot utilise SLF4J comme façade de logging et Logback comme implémentation par défaut.
+
+### Utilisation dans le code
+
+Pour logger dans vos classes :
+
+```java
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class ExempleService {
+    public void faireAction() {
+        log.info("Action réalisée");
+        log.error("Erreur détectée");
+    }
+}
+```
+
+Si vous n’utilisez pas Lombok :
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ExempleService {
+    private static final Logger log = LoggerFactory.getLogger(ExempleService.class);
+    // ...
+}
+```
+
+### Configuration
+
+Le fichier `src/main/resources/application.yml` permet de configurer le niveau de log :
+
+```yaml
+logging:
+  level:
+    root: INFO
+    com.hexagonal.demo: DEBUG
+```
+
+Pour personnaliser le format ou exporter les logs, créez un fichier `logback-spring.xml` dans `src/main/resources`.
+
+### Bonnes pratiques
+
+- Utilisez `log.info` pour les informations métier
+- Utilisez `log.debug` pour le debug technique
+- Utilisez `log.error` pour les erreurs
+- Ne loggez jamais de données sensibles
+- Centralisez les logs en production (ELK, Grafana, etc.)
+
 ## Technologies Utilisées
 
 - Spring Boot 3.2.0
