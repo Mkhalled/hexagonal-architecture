@@ -127,6 +127,54 @@ mvn spring-boot:run
 mvn test
 ```
 
+## Gestion des Erreurs
+
+Le projet implémente une gestion centralisée des erreurs via le `GlobalExceptionHandler`.
+
+### Types d'Erreurs
+
+#### Erreurs Métier
+
+- **ResourceNotFoundException** : Ressource non trouvée (HTTP 404)
+- **BusinessValidationException** : Erreur de validation métier (HTTP 400)
+- **BusinessException** : Erreur métier générique (HTTP 500)
+
+#### Erreurs Techniques
+
+- **MethodArgumentNotValidException** : Erreur de validation des paramètres (HTTP 400)
+- **AccessDeniedException** : Accès non autorisé (HTTP 403)
+- **Exception** : Erreurs non gérées (HTTP 500)
+
+### Format de Réponse d'Erreur
+
+Toutes les erreurs sont retournées dans un format standardisé `ApiError` :
+
+```json
+{
+  "code": "ERROR_CODE",
+  "message": "Description de l'erreur",
+  "status": 400,
+  "path": "/api/resource",
+  "timestamp": "2025-10-15T10:30:00"
+}
+```
+
+### Journalisation des Erreurs
+
+Chaque erreur est automatiquement journalisée avec un niveau approprié :
+
+- Erreurs de validation : WARN
+- Erreurs d'accès : ERROR
+- Erreurs système : ERROR
+
+### Exemple d'Utilisation
+
+Pour lever une erreur métier :
+
+```java
+throw new BusinessValidationException("INVALID_INPUT", "Les données fournies sont invalides");
+```
+
 ## Surveillance
 
 Les endpoints Actuator sont disponibles à :
