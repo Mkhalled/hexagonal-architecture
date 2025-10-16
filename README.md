@@ -5,17 +5,32 @@ Ce projet est un exemple de microservice Spring Boot utilisant l'architecture he
 ## Structure du Projet
 
 ```
-src/main/java/com/hexagonal/demo/
-├── domain/
-│   ├── model/           # Entités du domaine
-│   └── ports/
-│       ├── api/         # Ports primaires (entrée)
-│       └── spi/         # Ports secondaires (sortie)
-├── infrastructure/
-│   └── adapters/
-│       ├── input/       # Adaptateurs d'entrée (REST, etc.)
-│       └── output/      # Adaptateurs de sortie (Persistence, etc.)
-└── HexagonalApplication.java
+hexagonal-domain/
+  └── src/main/java/com/hexagonal/demo/domain/
+      ├── model/                  # Entités du domaine
+      ├── ports/
+      │   ├── api/               # Ports primaires (entrée)
+      │   └── spi/               # Ports secondaires (sortie)
+      ├── service/               # Services métier
+      └── exception/            # Exceptions métier
+
+hexagonal-application/
+  └── src/main/java/com/hexagonal/demo/application/
+      ├── service/               # Services d'application
+      └── exception/            # Exceptions d'application
+
+hexagonal-infrastructure/
+  └── src/main/java/com/hexagonal/demo/infrastructure/
+      ├── adapters/
+      │   ├── input/rest/        # Contrôleurs REST
+      │   └── output/persistence # Accès aux données (JPA, entités, mappers, repository)
+      ├── config/
+      │   ├── error/             # Gestion des erreurs
+      │   └── security/          # Sécurité (API Key, filtre, config)
+      └── utils/                 # Utilitaires
+
+hexagonal-boot/
+  └── src/main/java/com/hexagonal/demo/HexagonalApplication.java # Classe principale Spring Boot
 ```
 
 ## Gestion des logs
@@ -51,6 +66,29 @@ public class ExempleService {
 ```
 
 ### Configuration
+
+## Fichiers de configuration
+
+**application.yml** :
+Fichier principal de configuration Spring Boot. Il regroupe les paramètres de l’application : base de données, serveur, sécurité, logging, gestion des profils, etc. Il se trouve généralement dans resources.
+
+**bootstrap.yml** :
+Fichier utilisé pour la configuration initiale du contexte Spring Cloud (activation du cloud config, nom d’application, etc.). Il est chargé avant application.yml si présent. Dans ce projet, il sert à désactiver Spring Cloud Config et à définir le profil actif.
+
+**application-<profile>.yml** :
+Fichiers de configuration spécifiques à un profil (ex : application-test.yml, application-prod.yml). Permettent de surcharger la configuration selon l’environnement (test, dev, prod). Le profil actif est défini dans application.yml ou bootstrap.yml.
+
+a**pplication.properties** :
+Alternative à application.yml pour une configuration au format propriétés. Non utilisé ici, mais reconnu par Spring Boot.
+
+```
+hexagonal-boot/src/main/resources/
+├── application.yml           # Configuration principale
+├── bootstrap.yml            # Configuration initiale (cloud, profil)
+├── application-test.yml     # Surcharge pour le profil 'test' (optionnel)
+└── logback-spring.xml       # Configuration avancée des logs (optionnel)
+
+```
 
 Le fichier `src/main/resources/application.yml` permet de configurer le niveau de log :
 
@@ -144,8 +182,6 @@ Le projet implémente une gestion centralisée des erreurs via le `GlobalExcepti
 - **MethodArgumentNotValidException** : Erreur de validation des paramètres (HTTP 400)
 - **AccessDeniedException** : Accès non autorisé (HTTP 403)
 - **Exception** : Erreurs non gérées (HTTP 500)
-
-### Format de Réponse d'Erreur
 
 Toutes les erreurs sont retournées dans un format standardisé `ApiError` :
 

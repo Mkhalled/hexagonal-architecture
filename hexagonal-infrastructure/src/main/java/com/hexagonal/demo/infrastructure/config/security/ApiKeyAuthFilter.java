@@ -24,6 +24,15 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        String path = request.getRequestURI();
+        System.out.println("[ApiKeyAuthFilter] Intercepted path: " + path);
+        // Autoriser Swagger UI et la doc OpenAPI sans API Key
+        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.equals("/swagger-ui.html") ||
+            path.startsWith("/api/swagger-ui") || path.startsWith("/api/v3/api-docs") || path.equals("/api/swagger-ui.html")) {
+            System.out.println("[ApiKeyAuthFilter] Swagger/OpenAPI path detected, skipping API Key check.");
+            filterChain.doFilter(request, response);
+            return;
+        }
         String apiKey = request.getHeader(API_KEY_HEADER);
 
         if (apiKey == null || !apiKeyProperties.getApiKeys().contains(apiKey)) {
