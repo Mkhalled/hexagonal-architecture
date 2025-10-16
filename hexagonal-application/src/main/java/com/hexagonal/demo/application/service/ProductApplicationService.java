@@ -4,8 +4,6 @@ import com.hexagonal.demo.domain.ports.api.ProductService;
 import com.hexagonal.demo.domain.ports.spi.ProductRepository;
 import com.hexagonal.demo.domain.ports.spi.ProductRepository;
 import com.hexagonal.demo.domain.model.Product;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +12,6 @@ import java.util.Optional;
  * Service applicatif pour la gestion des produits.
  * Orchestre les interactions entre le domaine et l'infrastructure.
  */
-@Service
-@Transactional
 public class ProductApplicationService implements ProductService {
 
     private final ProductRepository productRepository;
