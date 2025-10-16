@@ -225,28 +225,9 @@ public ResponseEntity<YourDomainModel> create(...) {
 
 ## Qualité du Code
 
-### SpotBugs et Checkstyle
+### Checkstyle
 
-Ce projet intègre deux outils essentiels pour maintenir une haute qualité de code :
-
-#### 1. SpotBugs
-
-Outil d'analyse statique qui détecte automatiquement les bugs potentiels :
-
-```bash
-# Lancer l'analyse graphique
-mvn spotbugs:gui
-
-# Vérification en ligne de commande
-mvn spotbugs:check
-```
-
-SpotBugs vérifie :
-
-- Bugs de concurrence
-- Vulnérabilités de sécurité
-- Mauvaises pratiques
-- Problèmes de performance
+Ce projet intègre un outil essentiel pour maintenir une haute qualité de code :
 
 #### 2. Checkstyle
 
@@ -280,12 +261,10 @@ Cette commande exécute tous les contrôles qualité.
 
 2. **Rapports** :
 
-- SpotBugs : `target/spotbugsXml.xml`
 - Checkstyle : `target/site/checkstyle.html`
 
 3. **Configuration** :
 
-- SpotBugs : Configuration dans `pom.xml`
 - Checkstyle : Règles dans `checkstyle.xml`
 
 Pour plus de détails, consultez [CODE_QUALITY.md](docs/CODE_QUALITY.md)
@@ -297,7 +276,7 @@ Pour plus de détails, consultez [CODE_QUALITY.md](docs/CODE_QUALITY.md)
 3. **Logging** : Utilisez SLF4J pour le logging
 4. **Tests** : Visez une couverture de code élevée
 5. **Documentation** : Documentez vos API et votre code
-6. **Qualité** : Utilisez SpotBugs et Checkstyle avant chaque commit
+6. **Qualité** : Utilisez Checkstyle avant chaque commit
 
 ## Checklist de Développement
 

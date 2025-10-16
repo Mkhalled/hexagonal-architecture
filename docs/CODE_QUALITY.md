@@ -1,26 +1,5 @@
 ## Qualité du Code
 
-### SpotBugs
-
-SpotBugs est un outil d'analyse statique qui recherche des bugs potentiels dans le code Java. Il aide à détecter :
-
-- Bugs de concurrence
-- Mauvaises pratiques de programmation
-- Vulnérabilités de sécurité
-- Problèmes de performance
-
-Pour exécuter SpotBugs :
-
-```bash
-# Analyse complète avec rapport HTML
-mvn spotbugs:gui
-
-# Vérification rapide
-mvn spotbugs:check
-```
-
-Les rapports SpotBugs sont générés dans : `target/spotbugsXml.xml`
-
 ### Checkstyle
 
 Checkstyle est un outil qui vérifie si le code Java respecte les conventions de codage définies. Notre configuration vérifie :
@@ -57,12 +36,6 @@ mvn checkstyle:checkstyle
 Les rapports sont générés dans : `target/site/checkstyle.html`
 
 ### Configuration Personnalisée
-
-#### SpotBugs
-
-- Niveau d'effort : Max
-- Seuil : Low
-- Inclut FindSecBugs pour l'analyse de sécurité
 
 #### Checkstyle
 

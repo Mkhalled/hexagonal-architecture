@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: hexagonal-demo
+  profiles:
+    active: infrastructure
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

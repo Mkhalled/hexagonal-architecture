@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: hexagonal-demo
+  profiles:
+    active: infrastructure
+  cloud:
+    config:
+      enabled: false
