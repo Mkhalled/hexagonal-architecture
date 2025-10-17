@@ -31,3 +31,8 @@ logging:
     org.springframework.security: INFO
     org.springframework.web: INFO
     org.hibernate: INFO
+
+api:
+  security:
+    apiKeys:
+      - "ma_cle_api_test"

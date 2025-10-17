@@ -1,6 +1,8 @@
 
 package com.hexagonal.demo.application.service;
 
+// Renommé en ProductUseCase
+
 import com.hexagonal.demo.domain.ports.api.ProductService;
 import com.hexagonal.demo.domain.model.Product;
 
@@ -11,11 +13,11 @@ import java.util.Optional;
  * Service applicatif pour la gestion des produits.
  * Orchestration des cas d'usage métier via le service du domaine.
  */
-public class ProductApplicationService implements ProductService {
+public class ProductUseCase implements ProductService {
 
     private final ProductService productService;
 
-    public ProductApplicationService(ProductService productService) {
+    public ProductUseCase(ProductService productService) {
         if (productService == null) {
             throw new IllegalArgumentException("ProductService cannot be null");
         }

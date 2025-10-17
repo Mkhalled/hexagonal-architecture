@@ -71,5 +71,4 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    // Méthode createDefensiveCopy supprimée car non nécessaire
-}
+    }

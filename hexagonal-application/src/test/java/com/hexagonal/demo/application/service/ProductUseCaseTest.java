@@ -17,16 +17,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProductApplicationServiceTest {
-
+class ProductUseCaseTest {
     @Mock
     private ProductService productService;
-
-    private ProductApplicationService applicationService;
+    private ProductUseCase applicationService;
 
     @BeforeEach
     void setUp() {
-        applicationService = new ProductApplicationService(productService);
+    applicationService = new ProductUseCase(productService);
     }
 
     @Test
