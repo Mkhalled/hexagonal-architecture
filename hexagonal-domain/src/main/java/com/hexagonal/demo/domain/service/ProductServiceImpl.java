@@ -22,34 +22,35 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+
     public Product createProduct(Product product) {
-        validateProduct(createDefensiveCopy(product));
-        return createDefensiveCopy(productRepository.save(product));
+        validateProduct(product);
+        return productRepository.save(product);
     }
 
     @Override
+
     public Optional<Product> getProduct(Long id) {
         return Optional.ofNullable(productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Produit", id.toString())))
-                .map(this::createDefensiveCopy);
+                .orElseThrow(() -> new ResourceNotFoundException("Produit", id.toString())));
     }
 
     @Override
+
     public List<Product> getAllProducts() {
-        return productRepository.findAll().stream()
-                .map(this::createDefensiveCopy)
-                .toList();
+        return productRepository.findAll();
     }
 
     @Override
+
     public Product updateProduct(Product product) {
-        Product defensiveCopy = createDefensiveCopy(product);
-        getProduct(defensiveCopy.getId()); // Vérifie si le produit existe
-        validateProduct(defensiveCopy);
-        return createDefensiveCopy(productRepository.save(product));
+        getProduct(product.getId()); // Vérifie si le produit existe
+        validateProduct(product);
+        return productRepository.save(product);
     }
 
     @Override
+
     public void deleteProduct(Long id) {
         getProduct(id); // Vérifie si le produit existe
         productRepository.deleteById(id);
@@ -69,16 +70,6 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    private Product createDefensiveCopy(Product product) {
-        if (product == null) {
-            return null;
-        }
-        return Product.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice() != null ? new BigDecimal(product.getPrice().toString()) : null)
-                .quantity(product.getQuantity())
-                .build();
-    }
+
+    // Méthode createDefensiveCopy supprimée car non nécessaire
 }

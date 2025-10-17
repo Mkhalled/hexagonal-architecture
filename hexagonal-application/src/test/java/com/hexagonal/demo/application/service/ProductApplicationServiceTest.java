@@ -1,8 +1,7 @@
 package com.hexagonal.demo.application.service;
 
 import com.hexagonal.demo.domain.model.Product;
-import com.hexagonal.demo.domain.ports.spi.ProductRepository;
-import com.hexagonal.demo.domain.exception.ResourceNotFoundException;
+import com.hexagonal.demo.domain.ports.api.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,13 +20,13 @@ import static org.mockito.Mockito.*;
 class ProductApplicationServiceTest {
 
     @Mock
-    private ProductRepository productRepository;
+    private ProductService productService;
 
-    private ProductApplicationService productService;
+    private ProductApplicationService applicationService;
 
     @BeforeEach
     void setUp() {
-        productService = new ProductApplicationService(productRepository);
+        applicationService = new ProductApplicationService(productService);
     }
 
     @Test
@@ -36,15 +35,15 @@ class ProductApplicationServiceTest {
         Product product = new Product();
         product.setName("Test Product");
 
-        when(productRepository.save(any(Product.class))).thenReturn(product);
+        when(productService.createProduct(any(Product.class))).thenReturn(product);
 
         // Act
-        Product savedProduct = productService.createProduct(product);
+        Product savedProduct = applicationService.createProduct(product);
 
         // Assert
         assertThat(savedProduct).isNotNull();
         assertThat(savedProduct.getName()).isEqualTo("Test Product");
-        verify(productRepository).save(product);
+        verify(productService).createProduct(product);
     }
 
     @Test
@@ -56,14 +55,14 @@ class ProductApplicationServiceTest {
         product2.setId(2L);
         List<Product> products = Arrays.asList(product1, product2);
 
-        when(productRepository.findAll()).thenReturn(products);
+        when(productService.getAllProducts()).thenReturn(products);
 
         // Act
-        List<Product> result = productService.getAllProducts();
+        List<Product> result = applicationService.getAllProducts();
 
         // Assert
         assertThat(result).hasSize(2);
-        verify(productRepository).findAll();
+        verify(productService).getAllProducts();
     }
 
     @Test
@@ -71,16 +70,16 @@ class ProductApplicationServiceTest {
         // Arrange
         Product product = new Product();
         product.setId(1L);
-        
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        when(productService.getProduct(1L)).thenReturn(Optional.of(product));
 
         // Act
-        Optional<Product> result = productService.getProduct(1L);
+        Optional<Product> result = applicationService.getProduct(1L);
 
         // Assert
         assertThat(result).isPresent();
         assertThat(result.get().getId()).isEqualTo(1L);
-        verify(productRepository).findById(1L);
+        verify(productService).getProduct(1L);
     }
 
     @Test
@@ -90,15 +89,15 @@ class ProductApplicationServiceTest {
         updatedProduct.setId(1L);
         updatedProduct.setName("Updated Product");
 
-        when(productRepository.save(any(Product.class))).thenReturn(updatedProduct);
+        when(productService.updateProduct(any(Product.class))).thenReturn(updatedProduct);
 
         // Act
-        Product result = productService.updateProduct(updatedProduct);
+        Product result = applicationService.updateProduct(updatedProduct);
 
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo("Updated Product");
-        verify(productRepository).save(updatedProduct);
+        verify(productService).updateProduct(updatedProduct);
     }
 
     @Test
@@ -107,9 +106,9 @@ class ProductApplicationServiceTest {
         Long productId = 1L;
 
         // Act
-        productService.deleteProduct(productId);
+        applicationService.deleteProduct(productId);
 
         // Assert
-        verify(productRepository).deleteById(productId);
+        verify(productService).deleteProduct(productId);
     }
 }

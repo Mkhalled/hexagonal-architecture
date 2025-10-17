@@ -20,6 +20,12 @@
             <artifactId>hexagonal-infrastructure</artifactId>
         </dependency>
 
+        <!-- Feign Client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
         <!-- Development Tools (optionnel) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

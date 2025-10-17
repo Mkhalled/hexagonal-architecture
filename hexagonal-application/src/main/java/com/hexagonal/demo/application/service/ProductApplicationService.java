@@ -1,8 +1,7 @@
+
 package com.hexagonal.demo.application.service;
 
 import com.hexagonal.demo.domain.ports.api.ProductService;
-import com.hexagonal.demo.domain.ports.spi.ProductRepository;
-import com.hexagonal.demo.domain.ports.spi.ProductRepository;
 import com.hexagonal.demo.domain.model.Product;
 
 import java.util.List;
@@ -10,44 +9,41 @@ import java.util.Optional;
 
 /**
  * Service applicatif pour la gestion des produits.
- * Orchestre les interactions entre le domaine et l'infrastructure.
+ * Orchestration des cas d'usage métier via le service du domaine.
  */
 public class ProductApplicationService implements ProductService {
 
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
-    public ProductApplicationService(ProductRepository productRepository) {
-        if (productRepository == null) {
-            throw new IllegalArgumentException("ProductRepository cannot be null");
+    public ProductApplicationService(ProductService productService) {
+        if (productService == null) {
+            throw new IllegalArgumentException("ProductService cannot be null");
         }
-        this.productRepository = productRepository;
+        this.productService = productService;
     }
 
     @Override
     public Product createProduct(Product product) {
-        // Validation métier effectuée dans le domaine
-        return productRepository.save(product);
+        return productService.createProduct(product);
     }
 
     @Override
     public Optional<Product> getProduct(Long id) {
-        return productRepository.findById(id);
+        return productService.getProduct(id);
     }
 
     @Override
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productService.getAllProducts();
     }
 
     @Override
     public Product updateProduct(Product product) {
-        // La validation de l'existence du produit est effectuée dans le domaine
-        return productRepository.save(product);
+        return productService.updateProduct(product);
     }
 
     @Override
     public void deleteProduct(Long id) {
-        // La validation de l'existence du produit est effectuée dans le domaine
-        productRepository.deleteById(id);
+        productService.deleteProduct(id);
     }
 }
