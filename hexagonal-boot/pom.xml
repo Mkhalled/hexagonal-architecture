@@ -20,6 +20,12 @@
             <artifactId>hexagonal-infrastructure</artifactId>
         </dependency>
 
+        <!-- Application Module (Use Cases) -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hexagonal-application</artifactId>
+        </dependency>
+
         <!-- Feign Client -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
