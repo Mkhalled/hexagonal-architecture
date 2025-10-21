@@ -1,220 +1,486 @@
-# Projet Spring Boot avec Architecture Hexagonale
+# Hexagonal Architecture Spring Boot Demo
 
-Ce projet est un exemple de microservice Spring Boot utilisant l'architecture hexagonale (Ports & Adapters).
+A comprehensive demonstration of **Hexagonal Architecture (Ports & Adapters Pattern)** using Spring Boot 3.2.0 and Spring Cloud 2023.0.0.
 
-## Structure du Projet
+This project showcases how to build scalable, maintainable, and testable applications by keeping business logic completely independent from external frameworks and infrastructure concerns.
 
-```
-hexagonal-domain/
-  └── src/main/java/com/hexagonal/demo/domain/
-      ├── model/                  # Entités du domaine
-      ├── ports/
-      │   ├── api/               # Ports primaires (entrée)
-      │   └── spi/               # Ports secondaires (sortie)
-      ├── service/               # Services métier
-      └── exception/            # Exceptions métier
+---
 
-hexagonal-application/
-  └── src/main/java/com/hexagonal/demo/application/
-      ├── service/               # Services d'application
-      └── exception/            # Exceptions d'application
+## Table of Contents
 
-hexagonal-infrastructure/
-  └── src/main/java/com/hexagonal/demo/infrastructure/
-      ├── adapters/
-      │   ├── input/rest/        # Contrôleurs REST
-      │   └── output/persistence # Accès aux données (JPA, entités, mappers, repository)
-      ├── config/
-      │   ├── error/             # Gestion des erreurs
-      │   └── security/          # Sécurité (API Key, filtre, config)
-      └── utils/                 # Utilitaires
+1. [Project Overview](#project-overview)
+2. [Architecture](#architecture)
+3. [Module Descriptions](#module-descriptions)
+4. [Getting Started](#getting-started)
+5. [API Usage](#api-usage)
+6. [Key Technologies](#key-technologies)
+7. [Project Structure](#project-structure)
+8. [Design Patterns](#design-patterns)
 
-hexagonal-boot/
-  └── src/main/java/com/hexagonal/demo/HexagonalApplication.java # Classe principale Spring Boot
-```
+---
 
-## Gestion des logs
+## Project Overview
 
-Spring Boot utilise SLF4J comme façade de logging et Logback comme implémentation par défaut.
+This project implements a **Product Management System** using the Hexagonal Architecture pattern. The system demonstrates:
 
-### Utilisation dans le code
+- ✅ **Clean Separation of Concerns** - Each layer has a single responsibility
+- ✅ **Framework Agnostic Domain** - Business logic doesn't depend on Spring
+- ✅ **Testability** - Pure domain logic tested without framework overhead
+- ✅ **Flexible Adapters** - Easy to swap implementations (Database, APIs, etc.)
+- ✅ **API Layer Isolation** - DTOs keep API concerns separate from domain
 
-Pour logger dans vos classes :
+---
 
-```java
-import lombok.extern.slf4j.Slf4j;
+## Architecture
 
-@Slf4j
-public class ExempleService {
-    public void faireAction() {
-        log.info("Action réalisée");
-        log.error("Erreur détectée");
-    }
-}
-```
+### Hexagonal Architecture Pattern
 
-Si vous n’utilisez pas Lombok :
-
-```java
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class ExempleService {
-    private static final Logger log = LoggerFactory.getLogger(ExempleService.class);
-    // ...
-}
-```
-
-### Configuration
-
-## Fichiers de configuration
-
-**application.yml** :
-Fichier principal de configuration Spring Boot. Il regroupe les paramètres de l’application : base de données, serveur, sécurité, logging, gestion des profils, etc. Il se trouve généralement dans resources.
-
-**bootstrap.yml** :
-Fichier utilisé pour la configuration initiale du contexte Spring Cloud (activation du cloud config, nom d’application, etc.). Il est chargé avant application.yml si présent. Dans ce projet, il sert à désactiver Spring Cloud Config et à définir le profil actif.
-
-**application-<profile>.yml** :
-Fichiers de configuration spécifiques à un profil (ex : application-test.yml, application-prod.yml). Permettent de surcharger la configuration selon l’environnement (test, dev, prod). Le profil actif est défini dans application.yml ou bootstrap.yml.
-
-a**pplication.properties** :
-Alternative à application.yml pour une configuration au format propriétés. Non utilisé ici, mais reconnu par Spring Boot.
+The project follows the **Hexagonal Architecture** (also called **Ports & Adapters**), which organizes code into three main layers:
 
 ```
-hexagonal-boot/src/main/resources/
-├── application.yml           # Configuration principale
-├── bootstrap.yml            # Configuration initiale (cloud, profil)
-├── application-test.yml     # Surcharge pour le profil 'test' (optionnel)
-└── logback-spring.xml       # Configuration avancée des logs (optionnel)
-
+┌─────────────────────────────────────────────────────────┐
+│                      EXPOSITION LAYER                    │
+│  (REST Controllers, DTOs, JSON Serialization)            │
+├─────────────────────────────────────────────────────────┤
+│                    APPLICATION LAYER                     │
+│  (Use Cases, Orchestration, Business Workflows)          │
+├─────────────────────────────────────────────────────────┤
+│                      DOMAIN LAYER                        │
+│  (Pure Business Logic, Entities, Validation)             │
+├─────────────────────────────────────────────────────────┤
+│                   INFRASTRUCTURE LAYER                   │
+│  (Persistence, Security, Configuration, Adapters)       │
+└─────────────────────────────────────────────────────────┘
 ```
 
-Le fichier `src/main/resources/application.yml` permet de configurer le niveau de log :
+### Data Flow
 
-```yaml
-logging:
-  level:
-    root: INFO
-    com.hexagonal.demo: DEBUG
+```
+HTTP Request
+    ↓
+ProductController (Boot) - Accepts ProductDTO
+    ↓
+ProductUseCase (Application) - Orchestrates
+    ↓
+ProductServiceImpl (Domain) - Executes business logic
+    ↓
+ProductPersistenceAdapter (Infrastructure) - Calls JPA
+    ↓
+JpaProductRepository (Spring Data) - Database Access
+    ↓
+ProductMapper - Converts between layers
+    ↓
+HTTP Response (ProductDTO)
 ```
 
-Pour personnaliser le format ou exporter les logs, créez un fichier `logback-spring.xml` dans `src/main/resources`.
+---
 
-### Bonnes pratiques
+## Module Descriptions
 
-- Utilisez `log.info` pour les informations métier
-- Utilisez `log.debug` pour le debug technique
-- Utilisez `log.error` pour les erreurs
-- Ne loggez jamais de données sensibles
-- Centralisez les logs en production (ELK, Grafana, etc.)
+### 1. **hexagonal-domain** - Pure Business Logic Layer
 
-## Technologies Utilisées
+**Purpose**: Contains all business rules and domain logic, completely independent of any framework.
 
-- Spring Boot 3.2.0
-- Spring Data JPA
-- Spring Security
-- PostgreSQL (Production)
-- H2 (Tests)
-- Liquibase
-- Lombok
-- MapStruct
-- OpenAPI/Swagger
-- Spring Cloud OpenFeign
-- JUnit 5
-- Mockito
+**Key Components**:
 
-## Prérequis
+- **`Product.java`** - Domain entity representing a product
 
-- JDK 17
-- Maven
-- PostgreSQL
+  - Immutable data model
+  - Contains only business-relevant properties (id, name, description, price, quantity)
+  - Uses Lombok `@Builder` for object construction
 
-## Configuration
+- **`ProductServiceImpl.java`** - Domain service implementing business logic
 
-### Base de données
+  - `createProduct()` - Validates and creates products
+  - `getProduct()` - Retrieves a product
+  - `getAllProducts()` - Lists all products
+  - `updateProduct()` - Updates product with validation
+  - `deleteProduct()` - Removes a product
+  - All methods delegate to injected `ProductRepository` port
 
-#### Production
+- **`ProductService` (Port)** - Interface defining the domain contract
 
-- URL: jdbc:postgresql://localhost:5432/hexagonal_db
-- Username: postgres
-- Password: postgres
+  - Defines what operations the domain can perform
+  - Implemented by `ProductServiceImpl`
+  - Agnostic to Spring or any framework
 
-#### Tests
+- **`ProductRepository` (Port)** - Interface for data persistence
 
-- H2 in-memory database
+  - Defines data access contract: `save()`, `findById()`, `findAll()`, `deleteById()`
+  - No Spring Data annotations - pure interface
+  - Implemented by `ProductPersistenceAdapter` in infrastructure
 
-### Documentation API
+- **`BusinessValidationException`** - Custom domain exception
 
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- OpenAPI docs: http://localhost:8080/api-docs
+  - Thrown when business rules are violated
+  - Handled by global exception handler in boot layer
 
-## Exécution
+- **`ResourceNotFoundException`** - Custom domain exception
+  - Thrown when resource not found
+
+**Dependencies**:
+
+- Only JUnit and Mockito for testing
+- **Zero Spring dependencies** ✅
+
+**Testing**: `ProductServiceImplTest.java`
+
+- 7 comprehensive unit tests
+- Tests business logic without Spring context
+- Mocks `ProductRepository` port
+
+---
+
+### 2. **hexagonal-application** - Orchestration Layer
+
+**Purpose**: Implements use cases by orchestrating domain services and coordinating business flows.
+
+**Key Components**:
+
+- **`ProductUseCase.java`** - Application service
+  - Annotated with `@Service` for Spring component scanning
+  - Implements `ProductService` interface
+  - **Delegates to domain `ProductServiceImpl`**
+  - Provides a bridge between REST controllers and domain services
+  - Handles cross-cutting concerns that may be needed in future
+
+**Dependencies**:
+
+- hexagonal-domain module
+- spring-context (for @Service annotation)
+- JUnit, Mockito for testing
+
+**Testing**: `ProductUseCaseTest.java`
+
+- Verifies delegation to domain service
+- Mocks `ProductService` port
+
+---
+
+### 3. **hexagonal-infrastructure** - Technical Adapters Layer
+
+**Purpose**: Implements technical concerns like persistence, security, configuration, and external integrations.
+
+**Key Components**:
+
+#### **Persistence Adapter**
+
+- **`ProductPersistenceAdapter.java`** - Implements `ProductRepository` port
+
+  - Annotated with `@Component` for Spring
+  - Wraps `JpaProductRepository` (Spring Data JPA)
+  - Converts between `Product` (domain) ↔ `ProductEntity` (JPA)
+
+- **`ProductEntity.java`** - JPA persistence model
+
+  - Maps to database table `products`
+  - Separate from domain `Product`
+
+- **`JpaProductRepository`** - Spring Data JPA interface
+
+#### **Mapping & DTO**
+
+- **`ProductMapper.java`** - MapStruct mapper
+
+  - Converts: Entity ↔ Domain ↔ DTO
+  - Compile-time safe mappings
+
+- **`ProductDTO.java`** - Data Transfer Object
+  - Used for API request/response
+  - Shields domain model from API concerns
+
+#### **Security**
+
+- **`ApiKeyAuthFilter.java`** - Custom security filter
+
+  - Checks `X-API-KEY` header on every request
+  - Exempts Swagger UI (`/swagger-ui`, `/v3/api-docs`)
+
+- **`ApiKeyProperties.java`** - Configuration properties
+
+#### **Configuration**
+
+- **`SecurityConfig.java`** - Spring Security configuration
+- **`OpenApiConfig.java`** - Swagger/OpenAPI configuration
+- **`GlobalExceptionHandler.java`** - Centralized exception handling
+
+**Testing**:
+
+- `ApiKeyAuthFilterTest.java` - 7 tests
+- `ProductPersistenceAdapterTest.java` - 7 tests
+- `ProductMapperTest.java` - 11 tests
+
+---
+
+### 4. **hexagonal-boot** - Entry Point & Exposition Layer
+
+**Purpose**: Application bootstrap and REST endpoint exposure.
+
+**Key Components**:
+
+- **`HexagonalApplication.java`** - Spring Boot main class
+
+  - `@SpringBootApplication(scanBasePackages = "com.hexagonal.demo")`
+
+- **`ProductController.java`** - REST API endpoints
+
+  - Accepts & returns `ProductDTO` (not domain `Product`)
+  - Injects `ProductService` via `@Autowired`
+  - Endpoints:
+    - `POST /api/products` - Create
+    - `GET /api/products/{id}` - Get by ID
+    - `GET /api/products` - List all
+    - `PUT /api/products/{id}` - Update
+    - `DELETE /api/products/{id}` - Delete
+
+- **`application-dev.yml`** - Development configuration
+
+**Dependencies**:
+
+- hexagonal-application, hexagonal-infrastructure
+- spring-boot-starter-web
+- spring-boot-starter-data-jpa
+- springdoc-openapi-starter-webmvc-ui
+
+**Testing**: `ProductControllerTest.java`
+
+- 6 integration tests with MockMvc
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Java 17+
+- Maven 3.8.1+
+- PostgreSQL 12+ (localhost:5432)
+
+### 1. Create Database
 
 ```bash
-# Compilation
-mvn clean install
-
-# Lancement
-mvn spring-boot:run
+createdb hexagonal_db
 ```
 
-## Tests
+### 2. Build
+
+```bash
+mvn clean install
+```
+
+### 3. Run
+
+```bash
+mvn spring-boot:run -pl hexagonal-boot
+```
+
+Application starts on `http://localhost:8080/api`
+
+### 4. Access Swagger UI
+
+```
+http://localhost:8080/api/swagger-ui.html
+```
+
+---
+
+## API Usage
+
+### Headers Required
+
+All endpoints require:
+
+```
+X-API-Key: ma_cle_api_test
+```
+
+### Create Product
+
+```bash
+curl -X POST http://localhost:8080/api/products \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: ma_cle_api_test" \
+  -d '{
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 1299.99,
+    "quantity": 5
+  }'
+```
+
+### Get All Products
+
+```bash
+curl -X GET http://localhost:8080/api/products \
+  -H "X-API-Key: ma_cle_api_test"
+```
+
+### Get Product by ID
+
+```bash
+curl -X GET http://localhost:8080/api/products/1 \
+  -H "X-API-Key: ma_cle_api_test"
+```
+
+### Update Product
+
+```bash
+curl -X PUT http://localhost:8080/api/products/1 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: ma_cle_api_test" \
+  -d '{
+    "name": "Updated Laptop",
+    "price": 1199.99
+  }'
+```
+
+### Delete Product
+
+```bash
+curl -X DELETE http://localhost:8080/api/products/1 \
+  -H "X-API-Key: ma_cle_api_test"
+```
+
+---
+
+## Key Technologies
+
+| Technology        | Version  | Purpose               |
+| ----------------- | -------- | --------------------- |
+| Java              | 17       | Programming Language  |
+| Spring Boot       | 3.2.0    | Framework             |
+| Spring Cloud      | 2023.0.0 | Distributed Systems   |
+| Spring Data JPA   | 6.1.1    | ORM                   |
+| Hibernate         | 6.3.1    | JPA Implementation    |
+| PostgreSQL        | 12+      | Database              |
+| Liquibase         | 4.x      | Schema Migration      |
+| MapStruct         | 1.5.5    | Bean Mapping          |
+| Lombok            | Latest   | Boilerplate Reduction |
+| SpringDoc OpenAPI | 2.3.0    | Swagger/OpenAPI       |
+| JUnit 5           | 5.10.2   | Testing               |
+| Mockito           | 5.2.0    | Mocking               |
+
+---
+
+## Project Structure
+
+```
+hexagonal-architecture/
+├── hexagonal-domain/              # Business Logic (No Spring)
+│   ├── model/Product.java
+│   ├── ports/
+│   │   ├── ProductService.java
+│   │   └── ProductRepository.java
+│   ├── service/ProductServiceImpl.java
+│   ├── exception/
+│   └── test/ProductServiceImplTest.java
+│
+├── hexagonal-application/         # Orchestration (@Service)
+│   ├── service/ProductUseCase.java
+│   └── test/ProductUseCaseTest.java
+│
+├── hexagonal-infrastructure/      # Adapters & Config
+│   ├── adapters/output/persistence/
+│   │   ├── ProductPersistenceAdapter.java
+│   │   ├── entity/ProductEntity.java
+│   │   ├── mapper/ProductMapper.java
+│   │   └── repository/JpaProductRepository.java
+│   ├── config/
+│   │   ├── security/ApiKeyAuthFilter.java
+│   │   ├── SecurityConfig.java
+│   │   ├── OpenApiConfig.java
+│   │   └── GlobalExceptionHandler.java
+│   ├── dto/ProductDTO.java
+│   └── test/
+│       ├── ApiKeyAuthFilterTest.java
+│       ├── ProductPersistenceAdapterTest.java
+│       └── ProductMapperTest.java
+│
+├── hexagonal-boot/               # Entry Point
+│   ├── HexagonalApplication.java
+│   ├── controller/ProductController.java
+│   ├── resources/
+│   │   ├── application.yml
+│   │   ├── application-dev.yml
+│   │   └── db/changelog/
+│   └── test/ProductControllerTest.java
+│
+├── pom.xml
+└── README.md
+```
+
+---
+
+## Design Patterns Used
+
+1. **Hexagonal Architecture** - Ports & Adapters pattern
+2. **Repository Pattern** - Abstract persistence
+3. **Data Transfer Object (DTO)** - API model separation
+4. **Mapper Pattern** - Type-safe conversions (MapStruct)
+5. **Strategy Pattern** - Service implementations
+6. **Adapter Pattern** - Technical integrations
+7. **Filter Pattern** - Security filtering
+8. **Configuration Pattern** - Externalized config
+
+---
+
+## Testing Strategy
+
+### Domain Layer (No Spring) ✅
+
+- **ProductServiceImplTest.java** (7 tests)
+- Fast execution
+- Pure business logic
+
+### Application Layer ✅
+
+- **ProductUseCaseTest.java**
+- Tests delegation to domain
+
+### Infrastructure Layer ✅
+
+- **ApiKeyAuthFilterTest.java** (7 tests)
+- **ProductPersistenceAdapterTest.java** (7 tests)
+- **ProductMapperTest.java** (11 tests)
+
+### Boot Layer ✅
+
+- **ProductControllerTest.java** (6 tests)
+- Integration tests with Spring
+
+**Run Tests**:
 
 ```bash
 mvn test
+mvn test -pl hexagonal-domain
 ```
 
-## Gestion des Erreurs
+---
 
-Le projet implémente une gestion centralisée des erreurs via le `GlobalExceptionHandler`.
+## Clean Architecture Benefits
 
-### Types d'Erreurs
+✅ **Testability** - Domain tested without Spring
+✅ **Maintainability** - Clear separation of concerns
+✅ **Flexibility** - Easy to swap adapters
+✅ **Scalability** - Add use cases without impacting existing code
+✅ **Framework Agnostic** - Domain is framework-independent
 
-#### Erreurs Métier
+---
 
-- **ResourceNotFoundException** : Ressource non trouvée (HTTP 404)
-- **BusinessValidationException** : Erreur de validation métier (HTTP 400)
-- **BusinessException** : Erreur métier générique (HTTP 500)
+## Contributing
 
-#### Erreurs Techniques
+1. Follow the architectural layers
+2. Keep domain logic framework-independent
+3. Write unit tests for domain logic
+4. Use DTOs for API boundaries
+5. Run `mvn clean install` before committing
 
-- **MethodArgumentNotValidException** : Erreur de validation des paramètres (HTTP 400)
-- **AccessDeniedException** : Accès non autorisé (HTTP 403)
-- **Exception** : Erreurs non gérées (HTTP 500)
+---
 
-Toutes les erreurs sont retournées dans un format standardisé `ApiError` :
+## License
 
-```json
-{
-  "code": "ERROR_CODE",
-  "message": "Description de l'erreur",
-  "status": 400,
-  "path": "/api/resource",
-  "timestamp": "2025-10-15T10:30:00"
-}
-```
+MIT License
 
-### Journalisation des Erreurs
+---
 
-Chaque erreur est automatiquement journalisée avec un niveau approprié :
-
-- Erreurs de validation : WARN
-- Erreurs d'accès : ERROR
-- Erreurs système : ERROR
-
-### Exemple d'Utilisation
-
-Pour lever une erreur métier :
-
-```java
-throw new BusinessValidationException("INVALID_INPUT", "Les données fournies sont invalides");
-```
-
-## Surveillance
-
-Les endpoints Actuator sont disponibles à :
-
-- http://localhost:8080/actuator/health
-- http://localhost:8080/actuator/info
-- http://localhost:8080/actuator/metrics
+**Happy Coding! 🚀**
