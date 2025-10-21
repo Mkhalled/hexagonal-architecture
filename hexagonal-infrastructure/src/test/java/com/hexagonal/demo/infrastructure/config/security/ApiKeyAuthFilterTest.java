@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
@@ -74,52 +76,22 @@ class ApiKeyAuthFilterTest {
         verify(filterChain, never()).doFilter(request, response);
     }
 
-    @Test
-    void testSwaggerUIExemption() throws ServletException, IOException {
-        when(request.getRequestURI()).thenReturn("/swagger-ui.html");
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "/swagger-ui.html",
+            "/swagger-ui/index.html",
+            "/v3/api-docs",
+            "/api/swagger-ui.html",
+            "/api/v3/api-docs"
+    })
+    void testExemptedPathsDoNotRequireApiKey(String exemptedPath) throws ServletException, IOException {
+        // Given
+        when(request.getRequestURI()).thenReturn(exemptedPath);
 
+        // When
         apiKeyAuthFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain, times(1)).doFilter(request, response);
-        verify(response, never()).setStatus(HttpStatus.UNAUTHORIZED.value());
-    }
-
-    @Test
-    void testSwaggerUIPathExemption() throws ServletException, IOException {
-        when(request.getRequestURI()).thenReturn("/swagger-ui/index.html");
-
-        apiKeyAuthFilter.doFilterInternal(request, response, filterChain);
-
-        verify(filterChain, times(1)).doFilter(request, response);
-        verify(response, never()).setStatus(HttpStatus.UNAUTHORIZED.value());
-    }
-
-    @Test
-    void testOpenApiDocsExemption() throws ServletException, IOException {
-        when(request.getRequestURI()).thenReturn("/v3/api-docs");
-
-        apiKeyAuthFilter.doFilterInternal(request, response, filterChain);
-
-        verify(filterChain, times(1)).doFilter(request, response);
-        verify(response, never()).setStatus(HttpStatus.UNAUTHORIZED.value());
-    }
-
-    @Test
-    void testApiSwaggerUIPathExemption() throws ServletException, IOException {
-        when(request.getRequestURI()).thenReturn("/api/swagger-ui.html");
-
-        apiKeyAuthFilter.doFilterInternal(request, response, filterChain);
-
-        verify(filterChain, times(1)).doFilter(request, response);
-        verify(response, never()).setStatus(HttpStatus.UNAUTHORIZED.value());
-    }
-
-    @Test
-    void testApiOpenApiDocsPathExemption() throws ServletException, IOException {
-        when(request.getRequestURI()).thenReturn("/api/v3/api-docs");
-
-        apiKeyAuthFilter.doFilterInternal(request, response, filterChain);
-
+        // Then
         verify(filterChain, times(1)).doFilter(request, response);
         verify(response, never()).setStatus(HttpStatus.UNAUTHORIZED.value());
     }
