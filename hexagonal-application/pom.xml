@@ -20,6 +20,11 @@
             <artifactId>hexagonal-domain</artifactId>
         </dependency>
 
+        <!-- Spring Framework -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
 
         <!-- Tools -->
         <dependency>

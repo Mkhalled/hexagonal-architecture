@@ -1,10 +1,8 @@
 package com.hexagonal.demo.controller;
 
+import com.hexagonal.demo.application.service.ProductUseCase;
 import com.hexagonal.demo.domain.model.Product;
-import com.hexagonal.demo.domain.ports.api.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +28,7 @@ import java.util.List;
 public class ProductController {
 
     @Autowired
-    private ProductService productService;
+    private ProductUseCase productUseCase;
 
     @PostMapping
     @Operation(
@@ -52,7 +50,7 @@ public class ProductController {
         }
     )
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        return new ResponseEntity<>(productService.createProduct(product), HttpStatus.CREATED);
+        return new ResponseEntity<>(productUseCase.createProduct(product), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -64,7 +62,7 @@ public class ProductController {
         }
     )
     public ResponseEntity<Product> getProduct(@PathVariable Long id) {
-        return productService.getProduct(id)
+        return productUseCase.getProduct(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -77,7 +75,7 @@ public class ProductController {
         }
     )
     public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+        return ResponseEntity.ok(productUseCase.getAllProducts());
     }
 
     @PutMapping("/{id}")
@@ -90,7 +88,7 @@ public class ProductController {
     )
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
         product.setId(id);
-        return ResponseEntity.ok(productService.updateProduct(product));
+        return ResponseEntity.ok(productUseCase.updateProduct(product));
     }
 
     @DeleteMapping("/{id}")
@@ -102,7 +100,7 @@ public class ProductController {
         }
     )
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
+        productUseCase.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 }

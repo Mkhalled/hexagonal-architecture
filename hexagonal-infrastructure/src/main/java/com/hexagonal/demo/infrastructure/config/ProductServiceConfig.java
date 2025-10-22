@@ -6,8 +6,13 @@ import com.hexagonal.demo.domain.service.ProductServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration bean for domain services.
+ * Creates ProductService (domain implementation).
+ */
 @Configuration
 public class ProductServiceConfig {
+    
     @Bean
     public ProductService productService(ProductRepository productRepository) {
         return new ProductServiceImpl(productRepository);
