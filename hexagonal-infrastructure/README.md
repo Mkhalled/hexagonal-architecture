@@ -4,12 +4,14 @@ Adapters, configuration, and external dependencies - **Spring integration hub**.
 
 ## Quick Overview
 
-| Aspect            | Details                                                     |
-| ----------------- | ----------------------------------------------------------- |
-| **Purpose**       | Implement domain ports, configure Spring, handle exceptions |
-| **Adapters**      | Database, Security, OpenAPI, Persistence                    |
-| **Configuration** | GlobalExceptionHandler, SecurityConfig, OpenApiConfig       |
-| **Key Classes**   | ProductPersistenceAdapter, ProductMapper, ProductEntity     |
+| Aspect            | Details                                                                     |
+| ----------------- | --------------------------------------------------------------------------- |
+| **Purpose**       | Implement domain ports, configure Spring, handle exceptions                 |
+| **Adapters**      | Database (PostgreSQL), Security (API Key), OpenAPI (Swagger)                |
+| **Migrations**    | Liquibase (YAML-based, version controlled)                                  |
+| **Configuration** | GlobalExceptionHandler, SecurityConfig, OpenApiConfig, ProductServiceConfig |
+| **Key Classes**   | ProductPersistenceAdapter, ProductMapper, ProductEntity                     |
+| **Testing**       | H2 in-memory database, 17 integration tests (9 exception + 8 auth)          |
 
 ## Structure
 
@@ -30,6 +32,12 @@ infrastructure/
 │       └── SecurityConstants.java
 ├── error/
 │   └── GlobalExceptionHandler.java  (Exception → Response mapping)
+├── src/main/resources/
+│   ├── db/
+│   │   └── changelog/
+│   │       ├── db.changelog-master.yaml      (Liquibase main)
+│   │       └── changes/v1.0.0/               (Migrations)
+│   └── logback-spring.xml                    (Logging config)
 └── test/
     ├── GlobalExceptionHandlerTest.java   (9 tests)
     └── ApiKeyAuthFilterTest.java         (8 parameterized tests)
@@ -86,6 +94,35 @@ Domain Model (Product)  ←→  JPA Entity (ProductEntity)
 - API documentation
 - Security scheme definition
 
+### 6. Liquibase Migration Management
+
+**Automatic schema versioning:**
+
+```yaml
+db/
+└── changelog/
+├── db.changelog-master.yaml
+└── changes/
+└── v1.0.0/
+├── 01-create-products-table.yaml
+└── 02-create-index.yaml
+```
+
+**How it works:**
+
+1. Application startup triggers Liquibase
+2. Checks DATABASECHANGELOG table for executed migrations
+3. Runs new migrations in order
+4. Creates/updates DATABASECHANGELOCK for concurrency control
+
+**Benefits:**
+
+- ✅ Database schema version control (like Git for DB)
+- ✅ Automatic migrations on deployment
+- ✅ Rollback support (changeset reversions)
+- ✅ Team collaboration (no manual SQL scripts)
+- ✅ Audit trail (who changed what and when)
+
 ## Integration Points
 
 | Layer           | How It Connects                                   |
@@ -107,6 +144,77 @@ Domain Model (Product)  ←→  JPA Entity (ProductEntity)
 | JUnit 5           | Test      | Test    | Unit testing           |
 | Mockito           | Test      | Test    | Mock Spring components |
 
+## Getting Started
+
+### Run Infrastructure Tests
+
+```bash
+# Tests use H2 in-memory database
+mvn test -pl hexagonal-infrastructure
+
+# Run specific test
+mvn test -pl hexagonal-infrastructure -Dtest=GlobalExceptionHandlerTest
+mvn test -pl hexagonal-infrastructure -Dtest=ApiKeyAuthFilterTest
+```
+
+⚠️ **Note:** To run the full application with PostgreSQL and see adapters in action, see [Boot Module documentation](../hexagonal-boot/README.md).
+
+## Liquibase Database Migrations
+
+**What it does:**
+
+- Automatically runs on application startup (configured in Boot module)
+- Version controls database schema changes
+- Handles rollbacks and version tracking
+- Located in: `src/main/resources/db/changelog/`
+
+**Migration structure:**
+
+```
+db/changelog/
+├── db.changelog-master.yaml          (Main changelog)
+└── changes/
+    └── v1.0.0/
+        ├── 01-create-products-table.yaml
+        └── 02-create-index.yaml
+```
+
+**How migrations work:**
+
+1. Liquibase checks `DATABASECHANGELOG` table on startup
+2. Runs new migrations in order
+3. Records execution in `DATABASECHANGELOG`
+4. Creates `DATABASECHANGELOCK` for concurrency control
+
+**To add new migrations:**
+
+1. Create new file: `db/changelog/changes/v1.1.0/03-add-category.yaml`
+2. Include it in `db.changelog-master.yaml`:
+
+```yaml
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/v1.1.0/03-add-category.yaml
+```
+
+3. Restart application (runs automatically)
+
+**Example migration:**
+
+```yaml
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: khalled
+      changes:
+        - addColumn:
+            tableName: products
+            columns:
+              - column:
+                  name: category
+                  type: varchar(50)
+```
+
 ## Testing
 
 ### Integration Tests with H2
@@ -126,31 +234,6 @@ mvn test -pl hexagonal-infrastructure
 | ----------- | ------------------------------ |
 | Production  | PostgreSQL localhost:5432      |
 | Testing     | H2 in-memory (auto-configured) |
-
-## Configuration
-
-### application.properties (Production)
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/hexagonal_db
-spring.datasource.username=postgres
-spring.datasource.password=postgres
-```
-
-### application-test.yml (Testing)
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-  h2:
-    console:
-      enabled: true
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-  liquibase:
-    enabled: false
-```
 
 ## Design Philosophy
 
